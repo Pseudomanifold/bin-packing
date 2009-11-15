@@ -100,6 +100,9 @@ int main(int argc, char* argv[])
 	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
+	cout << "Max-Rest+: " << max_rest_pq(objects, time) << " bins, ";
+	cout << time << "s\n";
+
 	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 

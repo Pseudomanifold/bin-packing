@@ -8,7 +8,7 @@
 #ifndef MAX_REST_H
 #define MAX_REST_H
 
-unsigned int max_rest(const unsigned*, unsigned int*, double&);
-
+unsigned int max_rest(const unsigned int*, unsigned int*, double&);
+unsigned int max_rest_pq(const unsigned int* objects, double& time);
 
 #endif
