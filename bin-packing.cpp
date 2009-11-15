@@ -11,8 +11,10 @@
 
 using namespace std;
 
-unsigned int n = 0; ///< Number of objects for current problem
-unsigned int K = 0; ///< Capacity of bins for current problem
+unsigned int n = 0; 	///< Number of objects for current problem
+unsigned int K = 0; 	///< Capacity of bins for current problem
+unsigned int min_size;	///< Size of smallest object for current problem
+unsigned int max_size;	///< Size of largest object for current problem
 
 /*!
 	Comparison function for unsigned integers that compares values in
@@ -68,7 +70,17 @@ unsigned int* load_data(const char* filename)
 	unsigned int i = 0;
 	unsigned int* objects = new unsigned int[n];	
 
-	while(in >> objects[i++]);
+	min_size = K;
+	max_size = 0;
+
+	while(in >> objects[i++])
+	{
+		if(objects[i-1] > max_size)
+			max_size = objects[i-1];
+		
+		if(objects[i-1] < min_size)
+			min_size = objects[i-1];
+	}
 	
 	in.close();
 	return(objects);
@@ -94,20 +106,30 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
+	// If the bin is filled to more than (K-min_size), no object will fit
+	// anymore. Hence, the bin is removed and treated as if it was full.
+	unsigned int limit_capacity = K-min_size;
+	
+	// This variable is set per object. It is the minimum capacity that is
+	// required in order to fit the object into a certain bin.
+	unsigned int required_capacity;
+	
 	for(unsigned int i = 0; i < n; i++)
 	{
+		required_capacity = K-objects[i];
 		for(unsigned int j = 0; j < num_open_bins; j++)
 		{
-			if((bins[j]+objects[i]) <= K)
+			if(bins[j] <= required_capacity)
 			{
 				bins[j] += objects[i];
 				positions[i] = j+1;
 
-				// Full bins need not be searched
-				if(bins[j] == K)
+				// Remove the bin if it is (almost) full after
+				// packing the object. 
+				if(bins[j] > limit_capacity)
 				{
-					num_full_bins++;
 					num_open_bins--;
+					num_full_bins++;
 					bins[j] = bins[num_open_bins];
 				}
 
@@ -185,18 +207,20 @@ unsigned int next_fit_decreasing(const unsigned* objects, unsigned int* position
 
 unsigned int best_fit(const unsigned* objects, unsigned int* positions)
 {
-	unsigned int num_bins = 1;
+	unsigned int num_open_bins = 1;
+	unsigned int num_full_bins = 0;
 	unsigned int* bins = new unsigned int[n];
 	
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
+	unsigned int limit_capacity = K-min_size;
 	for(unsigned int i = 0; i < n; i++)
 	{
 		unsigned int best_bin = n; // best bin that has been determined so far
 		unsigned int best_cap = 0; // capacity for said bin if the object has been added
 
-		for(unsigned int j = 0; j < num_bins; j++)
+		for(unsigned int j = 0; j < num_open_bins; j++)
 		{
 			unsigned int temp_cap = bins[j]+objects[i];
 			if(temp_cap <= K && temp_cap > best_cap)
@@ -211,35 +235,45 @@ unsigned int best_fit(const unsigned* objects, unsigned int* positions)
 		{
 			bins[best_bin] += objects[i];
 			positions[i] = best_bin;
+
+			// Remove (almost) full bins
+			if(bins[best_bin] > limit_capacity)
+			{
+				num_open_bins--;
+				num_full_bins++;
+				bins[best_bin] = bins[num_open_bins];
+			}
 		}
 
 		// ...else create a new one
 		else
 		{
-			bins[num_bins] = objects[i];
-			positions[i] = num_bins++;
+			bins[num_open_bins] = objects[i];
+			positions[i] = num_open_bins++;
 		}
 	}
 
 	delete[] bins;
-	return(num_bins);
+	return(num_open_bins+num_full_bins);
 
 }
 
 unsigned int max_rest(const unsigned* objects, unsigned int* positions)
 {
-	unsigned int num_bins = 1;
+	unsigned int num_open_bins = 1;
+	unsigned int num_full_bins = 0;
 	unsigned int* bins = new unsigned int[n];
 	
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
+	unsigned int limit_capacity = K-min_size;
 	for(unsigned int i = 0; i < n; i++)
 	{
 		unsigned int max_bin = n; 	// bin with maximum _remaining_ capacity 
 		unsigned int max_rem_cap = K; 	// capacity for said bin 
 
-		for(unsigned int j = 0; j < num_bins; j++)
+		for(unsigned int j = 0; j < num_open_bins; j++)
 		{
 			if(bins[j] < max_rem_cap)
 			{
@@ -250,22 +284,30 @@ unsigned int max_rest(const unsigned* objects, unsigned int* positions)
 		
 		// Check whether object fits into the bin with maximum
 		// remaining capacity...
-		if((bins[max_bin]+objects[i]) <= K)
+		if((max_bin < n) && (bins[max_bin]+objects[i]) <= K)
 		{
 			bins[max_bin] += objects[i];
 			positions[i] = max_bin;
+
+			// Remove (almost) full bins
+			if(bins[max_bin] > limit_capacity)
+			{
+				num_open_bins--;
+				num_full_bins++;
+				bins[max_bin] = bins[num_open_bins];
+			}
 		}
 
 		// ...else create a new one
 		else
 		{
-			bins[num_bins] = objects[i];
-			positions[i] = num_bins++;
+			bins[num_open_bins] = objects[i];
+			positions[i] = num_open_bins++;
 		}
 	}
 
 	delete[] bins;
-	return(num_bins);
+	return(num_open_bins+num_full_bins);
 
 }
 
@@ -274,12 +316,16 @@ int main(int argc, char* argv[])
 	unsigned int* objects 	= load_data("bp3");
 	unsigned int* positions = new unsigned int[n];
 
-	//cout << "Max-Rest: " << max_rest(objects, positions) << "\n"; 
+	cout 	<< "#objects:\t"	<< n		<< "\n"
+		<< "min:\t" 		<< min_size 	<< "\n"
+		<< "max:\t"		<< max_size 	<< "\n\n";
+
+	cout << "Max-Rest: " << max_rest(objects, positions) << "\n"; 
 	cout << "First-Fit: " << first_fit(objects, positions) << "\n";
-	//cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions) << "\n";
-	//cout << "Next-Fit: " << next_fit(objects, positions) << "\n";
-	//cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions) << "\n"; 
-	//cout << "Best-Fit: " << best_fit(objects, positions) << "\n"; 
+	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions) << "\n";
+	cout << "Next-Fit: " << next_fit(objects, positions) << "\n";
+	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions) << "\n"; 
+	cout << "Best-Fit: " << best_fit(objects, positions) << "\n"; 
 
 	delete[] objects;
 	delete[] positions;
