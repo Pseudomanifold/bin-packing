@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <ctime>
 
 using namespace std;
 
@@ -93,11 +94,13 @@ unsigned int* load_data(const char* filename)
 	@param positions	Array that will contain the associations for the
 				objects. The entry in position i signifies the bin
 				that contains object i.
+	@param time		Variable that will be filled with the elapsed time
+				after the bins haven been sorted.
 
 	@return	Number of bins opened by the heuristic.
 */
 
-unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
+unsigned int first_fit(const unsigned int* objects, unsigned int* positions, double& time)
 {
 	unsigned int num_open_bins = 1;
 	unsigned int num_full_bins = 0;
@@ -109,11 +112,12 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
 	// If the bin is filled to more than (K-min_size), no object will fit
 	// anymore. Hence, the bin is removed and treated as if it was full.
 	unsigned int limit_capacity = K-min_size;
-	
+
 	// This variable is set per object. It is the minimum capacity that is
 	// required in order to fit the object into a certain bin.
 	unsigned int required_capacity;
-	
+
+	clock_t start = clock();
 	for(unsigned int i = 0; i < n; i++)
 	{
 		required_capacity = K-objects[i];
@@ -124,6 +128,7 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
 				bins[j] += objects[i];
 				positions[i] = j+1;
 
+				/*
 				// Remove the bin if it is (almost) full after
 				// packing the object. 
 				if(bins[j] > limit_capacity)
@@ -131,8 +136,10 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
 					num_open_bins--;
 					num_full_bins++;
 					bins[j] = bins[num_open_bins];
+					bins[num_open_bins] = 0;
 				}
-
+				*/
+			
 				break;
 			}
 		}
@@ -142,30 +149,38 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions)
 		if(positions[i] == 0)
 		{
 			bins[num_open_bins] = objects[i];
-			positions[i] = ++num_open_bins;
+			positions[i] = (++num_open_bins);
 		}
 	}
+	
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
 
 	delete[] bins;
 	return(num_open_bins+num_full_bins);
 }
 
-unsigned int first_fit_decreasing(const unsigned int* objects, unsigned int* positions)
+unsigned int first_fit_decreasing(const unsigned int* objects, unsigned int* positions, double& time)
 {
 	unsigned int* sorted_objects = new unsigned int[n];
 	memcpy(sorted_objects, objects, n*sizeof(unsigned int));
 
 	unsigned int num_bins;
+
+	clock_t start = clock();
 	if(heapsort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = first_fit(sorted_objects, positions);
+		num_bins = first_fit(sorted_objects, positions, time);
 	else
 		cerr << "first_fit_decreasing: Heapsort failed\n";
-	
+	clock_t end = clock();
+
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+		
 	delete[] sorted_objects;
 	return(num_bins);
 }
 
-unsigned int next_fit(const unsigned int* objects, unsigned int* positions)
+unsigned int next_fit(const unsigned int* objects, unsigned int* positions, double& time)
 {
 	unsigned int cur_bin = 0; 
 	unsigned int* bins = new unsigned int[n];
@@ -173,6 +188,7 @@ unsigned int next_fit(const unsigned int* objects, unsigned int* positions)
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
+	clock_t start = clock();
 	for(unsigned int i = 0; i < n; i++)
 	{
 		// Check whether the object fits in the current bin... 
@@ -185,27 +201,35 @@ unsigned int next_fit(const unsigned int* objects, unsigned int* positions)
 		
 		positions[i] = cur_bin;
 	}
+	
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
 
 	delete[] bins;
 	return(cur_bin+1);
 }
 
-unsigned int next_fit_decreasing(const unsigned* objects, unsigned int* positions)
+unsigned int next_fit_decreasing(const unsigned* objects, unsigned int* positions, double& time)
 {
 	unsigned int* sorted_objects = new unsigned int[n];
 	memcpy(sorted_objects, objects, n*sizeof(unsigned int));
 
 	unsigned int num_bins;
+	
+	clock_t start = clock();
 	if(heapsort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = next_fit(sorted_objects, positions);
+		num_bins = next_fit(sorted_objects, positions, time);
 	else
 		cout << "next_fit_decreasing: Heapsort failed\n";
 	
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+
 	delete[] sorted_objects;
 	return(num_bins);
 }
 
-unsigned int best_fit(const unsigned* objects, unsigned int* positions)
+unsigned int best_fit(const unsigned* objects, unsigned int* positions, double& time)
 {
 	unsigned int num_open_bins = 1;
 	unsigned int num_full_bins = 0;
@@ -215,6 +239,8 @@ unsigned int best_fit(const unsigned* objects, unsigned int* positions)
 	memset(positions, 0, n*sizeof(unsigned int));
 
 	unsigned int limit_capacity = K-min_size;
+	
+	clock_t start = clock();
 	for(unsigned int i = 0; i < n; i++)
 	{
 		unsigned int best_bin = n; // best bin that has been determined so far
@@ -253,12 +279,15 @@ unsigned int best_fit(const unsigned* objects, unsigned int* positions)
 		}
 	}
 
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+
 	delete[] bins;
 	return(num_open_bins+num_full_bins);
 
 }
 
-unsigned int max_rest(const unsigned* objects, unsigned int* positions)
+unsigned int max_rest(const unsigned* objects, unsigned int* positions, double& time)
 {
 	unsigned int num_open_bins = 1;
 	unsigned int num_full_bins = 0;
@@ -268,6 +297,8 @@ unsigned int max_rest(const unsigned* objects, unsigned int* positions)
 	memset(positions, 0, n*sizeof(unsigned int));
 
 	unsigned int limit_capacity = K-min_size;
+
+	clock_t start = clock();
 	for(unsigned int i = 0; i < n; i++)
 	{
 		unsigned int max_bin = n; 	// bin with maximum _remaining_ capacity 
@@ -306,26 +337,45 @@ unsigned int max_rest(const unsigned* objects, unsigned int* positions)
 		}
 	}
 
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+
 	delete[] bins;
 	return(num_open_bins+num_full_bins);
-
 }
 
 int main(int argc, char* argv[])
 {
-	unsigned int* objects 	= load_data("bp3");
+	unsigned int* objects 	= load_data("bp4");
 	unsigned int* positions = new unsigned int[n];
 
 	cout 	<< "#objects:\t"	<< n		<< "\n"
 		<< "min:\t" 		<< min_size 	<< "\n"
 		<< "max:\t"		<< max_size 	<< "\n\n";
 
-	cout << "Max-Rest: " << max_rest(objects, positions) << "\n"; 
-	cout << "First-Fit: " << first_fit(objects, positions) << "\n";
-	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions) << "\n";
-	cout << "Next-Fit: " << next_fit(objects, positions) << "\n";
-	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions) << "\n"; 
-	cout << "Best-Fit: " << best_fit(objects, positions) << "\n"; 
+	double time;	
+	
+	/*
+	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, "; 
+	cout << time << "s\n"; 
+	*/
+	
+		
+	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
+	cout << time << "s\n"; 
+	/*
+	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
+	cout << time << "s\n";
+	
+	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
+	cout << time << "s\n";
+
+	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time) << " bins, "; 
+	cout << time << "s\n";
+
+	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
+	cout << time << "s\n";
+	*/
 
 	delete[] objects;
 	delete[] positions;
