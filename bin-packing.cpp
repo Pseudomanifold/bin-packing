@@ -1,8 +1,8 @@
 /*!
-	@file 	bin.cpp
+	@file	bin.cpp
 	@brief	Bin-packing demo program
-	
-	@author Bastian Rieck 
+
+	@author Bastian Rieck
 */
 
 #include <iostream>
@@ -18,8 +18,8 @@
 
 using namespace std;
 
-unsigned int n = 0; 	///< Number of objects for current problem
-unsigned int K = 0; 	///< Capacity of bins for current problem
+unsigned int n = 0;	///< Number of objects for current problem
+unsigned int K = 0;	///< Capacity of bins for current problem
 unsigned int min_size;	///< Size of smallest object for current problem
 unsigned int max_size;	///< Size of largest object for current problem
 
@@ -69,7 +69,7 @@ unsigned int* load_data()
 		return(NULL);
 
 	unsigned int i = 0;
-	unsigned int* objects = new unsigned int[n];	
+	unsigned int* objects = new unsigned int[n];
 
 	min_size = K;
 	max_size = 0;
@@ -78,38 +78,38 @@ unsigned int* load_data()
 	{
 		if(objects[i-1] > max_size)
 			max_size = objects[i-1];
-		
+
 		if(objects[i-1] < min_size)
 			min_size = objects[i-1];
 	}
-	
+
 	return(objects);
 }
 
 int main(int argc, char* argv[])
 {
-	unsigned int* objects 	= load_data();
+	unsigned int* objects	= load_data();
 	unsigned int* positions = new unsigned int[n];
 
-	cout 	<< "#objects:\t"	<< n		<< "\n"
-		<< "min:\t" 		<< min_size 	<< "\n"
-		<< "max:\t"		<< max_size 	<< "\n\n";
+	cout	<< "#objects:\t"	<< n		<< "\n"
+		<< "min:\t"		<< min_size	<< "\n"
+		<< "max:\t"		<< max_size	<< "\n\n";
 
-	double time;	
+	double time;
 
-	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, "; 
-	cout << time << "s\n"; 
+	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, ";
+	cout << time << "s\n";
 
 	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
-	cout << time << "s\n"; 
-	
+	cout << time << "s\n";
+
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
-	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time) << " bins, "; 
+	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
 	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
