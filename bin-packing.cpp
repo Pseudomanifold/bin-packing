@@ -106,7 +106,13 @@ int main(int argc, char* argv[])
 	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
+	cout << "First-Fit+: " << first_fit_vec(objects, time) << " bins, ";
+	cout << time << "s\n";
+
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
+	cout << time << "s\n";
+
+	cout << "First-Fit-Decreasing+: " << first_fit_decreasing_vec(objects, time) << " bins, ";
 	cout << time << "s\n";
 
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
