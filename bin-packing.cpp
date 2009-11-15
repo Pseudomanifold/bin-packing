@@ -48,27 +48,22 @@ int compare_uints(const void* a, const void* b)
 }
 
 /*!
-	Reads test data from a file. The file contains n in the first line, K
-	in the second line, followed all by all volumes.
+	Reads test data from STDIN. The test data is supposed to come from a
+	file that contains n in the first line, K in the second line, followed
+	all by all volumes.
 
-	@param filename	Filename
-	
 	@return Pointer to an array that contains all objects. Memory is
 	allocated automatically and has to be freed by the programmer. If an
 	error occurs, a NULL pointer will be returned.
 */
 
-unsigned int* load_data(const char* filename)
+unsigned int* load_data()
 {
-	ifstream in(filename);
-	if(!in.is_open())
-		return(NULL);
-
 	n = 0;
 	K = 0;
 
-	in >> n;
-	in >> K;
+	cin >> n;
+	cin >> K;
 
 	if(n == 0 || K == 0)
 		return(NULL);
@@ -79,7 +74,7 @@ unsigned int* load_data(const char* filename)
 	min_size = K;
 	max_size = 0;
 
-	while(in >> objects[i++])
+	while(cin >> objects[i++])
 	{
 		if(objects[i-1] > max_size)
 			max_size = objects[i-1];
@@ -88,13 +83,12 @@ unsigned int* load_data(const char* filename)
 			min_size = objects[i-1];
 	}
 	
-	in.close();
 	return(objects);
 }
 
 int main(int argc, char* argv[])
 {
-	unsigned int* objects 	= load_data("bp4");
+	unsigned int* objects 	= load_data();
 	unsigned int* positions = new unsigned int[n];
 
 	cout 	<< "#objects:\t"	<< n		<< "\n"
@@ -102,16 +96,16 @@ int main(int argc, char* argv[])
 		<< "max:\t"		<< max_size 	<< "\n\n";
 
 	double time;	
-	
+
 	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, "; 
 	cout << time << "s\n"; 
-		
+
 	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n"; 
 	
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
-	
+
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 

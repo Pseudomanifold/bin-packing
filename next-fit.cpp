@@ -11,6 +11,12 @@
 
 #include "bin-packing.h"
 
+/*!
+	Applies the "Next-Fit" heuristic to the current problem. Worst-case
+	running-time is O(n) because the heuristic loops once over the object
+	set and can open new bins in constant time.
+*/
+
 unsigned int next_fit(const unsigned int* objects, unsigned int* positions, double& time)
 {
 	unsigned int cur_bin = 0; 
@@ -39,6 +45,13 @@ unsigned int next_fit(const unsigned int* objects, unsigned int* positions, doub
 	delete[] bins;
 	return(cur_bin+1);
 }
+
+/*!
+	Applies the "Next-Fit-Decreasing" heuristic to the current problem.
+	Since the worst-case running time of "Next-Fit" is O(n), the running
+	time of "Next-Fit-Decreasing" is dominated by the sorting procedure.
+	Hence, the worst-case running time is O(n log n) when using heapsort.
+*/
 
 unsigned int next_fit_decreasing(const unsigned* objects, unsigned int* positions, double& time)
 {

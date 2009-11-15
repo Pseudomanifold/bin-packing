@@ -11,6 +11,11 @@
 
 #include "bin-packing.h"
 
+/*!
+	Performs the "Max-Rest" heuristic for the current problem. Worst-case
+	running time is O(n^2).
+*/
+
 unsigned int max_rest(const unsigned* objects, unsigned int* positions, double& time)
 {
 	unsigned int num_open_bins = 1;

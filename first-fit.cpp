@@ -12,7 +12,8 @@
 #include "bin-packing.h"
 
 /*!
-	Applies the "First-Fit" heuristic to the current problem.
+	Applies the "First-Fit" heuristic to the current problem. Worst-case
+	running time is O(n^2). 
 
 	@param objects 		Array of object sizes
 	@param positions	Array that will contain the associations for the
@@ -29,7 +30,7 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions, dou
 	unsigned int num_open_bins = 1;
 	unsigned int num_full_bins = 0;
 	unsigned int* bins = new unsigned int[n];
-	
+
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
@@ -83,6 +84,12 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions, dou
 	delete[] bins;
 	return(num_open_bins+num_full_bins);
 }
+
+/*
+	Applies the "First-Fit-Decreasing" heuristic to the current problem.
+	Worst-case running time is, not taking into account sorting with O(n
+	log n), O(n^2) because the "First-Fit" heuristic is called.
+*/
 
 unsigned int first_fit_decreasing(const unsigned int* objects, unsigned int* positions, double& time)
 {

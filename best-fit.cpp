@@ -11,6 +11,11 @@
 
 #include "bin-packing.h"
 
+/*!
+	Performs the "Best-Fit" heuristic for the current problem. Worst-case
+	running time is O(n^2).
+*/
+
 unsigned int best_fit(const unsigned* objects, unsigned int* positions, double& time)
 {
 	unsigned int num_open_bins = 1;
@@ -68,4 +73,3 @@ unsigned int best_fit(const unsigned* objects, unsigned int* positions, double& 
 	return(num_open_bins+num_full_bins);
 
 }
-
