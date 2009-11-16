@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 
 	double time;
 
+	/*
 	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
@@ -111,10 +112,11 @@ int main(int argc, char* argv[])
 
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
+	*/
 
 	cout << "First-Fit-Decreasing+: " << first_fit_decreasing_vec(objects, time) << " bins, ";
 	cout << time << "s\n";
-
+	
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
@@ -123,6 +125,11 @@ int main(int argc, char* argv[])
 
 	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
+
+	/*
+	cout << "Best-Fit+: " << best_fit_depq(objects, time) << " bins, ";
+	cout << time << "s\n";
+	*/
 
 	delete[] objects;
 	delete[] positions;
