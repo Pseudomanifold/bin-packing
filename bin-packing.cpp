@@ -48,6 +48,44 @@ int compare_uints(const void* a, const void* b)
 }
 
 /*!
+	Implementation of counting sort for unsigned integers. The numbers will
+	be sorted in decreasing order. The function has the same signature as
+	the qsort and heapsort methods for the standard C library, thus
+	allowing the routines to switch the sorting method.
+
+	@param base	Pointer to objects array
+	@param nmemb	Unused
+	@param size	Unused; size is known by global variable n
+	@param compar	Unused
+
+	@return	Always 0 in order to signify that the sorting process was
+		finished succesfully.
+*/
+
+int csort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, const void*))
+{
+	unsigned int range = max_size - min_size + 1;
+	unsigned int* count = new unsigned int[range];
+
+	memset(count, 0, range*sizeof(unsigned int));
+
+	unsigned int* objects = reinterpret_cast<unsigned int*>(base);
+
+	for(unsigned int i = 0; i < n; i++)
+		count[objects[i] - min_size]++;
+
+	unsigned int z = 0;
+	for(unsigned int i = min_size; i <= max_size; i++)
+	{
+		for(unsigned int j = 0; j < count[i - min_size]; j++)
+			objects[n-1-z++] = i;
+	}
+
+	delete []count;
+	return(0);
+}
+
+/*!
 	Reads test data from STDIN. The test data is supposed to come from a
 	file that contains n in the first line, K in the second line, followed
 	all by all volumes.
@@ -97,7 +135,6 @@ int main(int argc, char* argv[])
 
 	double time;
 
-	/*
 	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
@@ -112,24 +149,27 @@ int main(int argc, char* argv[])
 
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
-	*/
 
-	cout << "First-Fit-Decreasing+: " << first_fit_decreasing_vec(objects, time) << " bins, ";
+	cout << "First-Fit-Decreasing+: " << first_fit_decreasing_vec(objects, time, heapsort) << " bins, ";
 	cout << time << "s\n";
 	
+	cout << "First-Fit-Decreasing++: " << first_fit_decreasing_vec(objects, time, csort) << " bins, ";
+	cout << time << "s\n";
+
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
-	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time) << " bins, ";
+	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time, heapsort) << " bins, ";
+	cout << time << "s\n";
+
+	cout << "Next-Fit-Decreasing+: " << next_fit_decreasing(objects, positions, time, csort) << " bins, ";
 	cout << time << "s\n";
 
 	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
-	/*
 	cout << "Best-Fit+: " << best_fit_depq(objects, time) << " bins, ";
 	cout << time << "s\n";
-	*/
 
 	delete[] objects;
 	delete[] positions;

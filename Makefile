@@ -1,5 +1,5 @@
 CC          = g++
-CCFLAGS     = -Wall -c -g
+CCFLAGS     = -Wall -c -g -O3
 LIBS        = 
 INCLUDES    = 
 LDFLAGS     =

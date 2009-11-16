@@ -9,6 +9,9 @@
 #define NEXT_FIT_H
 
 unsigned int next_fit(const unsigned int*, unsigned int*, double&);
-unsigned int next_fit_decreasing(const unsigned*, unsigned int*, double&);
+unsigned int next_fit_decreasing(	const unsigned*,
+					unsigned int*,
+					double&,
+					int (*)(void*, size_t, size_t, int (*)(const void*, const void*)));
 
 #endif

@@ -95,7 +95,7 @@ unsigned int best_fit_depq(const unsigned* objects, double& time)
 {
 	unsigned int num_open_bins = 1;
 	unsigned int num_full_bins = 0;
-	unsigned int limit_capacity = K-min_size;
+	//unsigned int limit_capacity = K-min_size;
 
 	std::priority_queue<unsigned int> pq;
 	pq.push(0);

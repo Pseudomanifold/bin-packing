@@ -13,6 +13,8 @@ unsigned int first_fit(const unsigned int*, unsigned int*, double&);
 unsigned int first_fit_decreasing(const unsigned int*, unsigned int*, double&);
 
 unsigned int first_fit_vec(const unsigned int*, double&);
-unsigned int first_fit_decreasing_vec(const unsigned int*, double&);
+unsigned int first_fit_decreasing_vec(	const unsigned int*, 
+					double&, 
+					int(*)(void*, size_t, size_t, int (*)(const void*, const void*)));
 
 #endif
