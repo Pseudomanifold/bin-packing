@@ -36,12 +36,6 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions, dou
 	memset(bins, 0, n*sizeof(unsigned int));
 	memset(positions, 0, n*sizeof(unsigned int));
 
-	/*
-	// If the bin is filled to more than (K-min_size), no object will fit
-	// anymore. Hence, the bin is removed and treated as if it was full.
-	unsigned int limit_capacity = K-min_size;
-	*/
-
 	// This variable is set per object. It is the minimum capacity that is
 	// required in order to fit the object into a certain bin.
 	unsigned int required_capacity;
@@ -57,18 +51,6 @@ unsigned int first_fit(const unsigned int* objects, unsigned int* positions, dou
 				bins[j] += objects[i];
 				positions[i] = j+1;
 
-				/*
-				// Remove the bin if it is (almost) full after
-				// packing the object. 
-				if(bins[j] > limit_capacity)
-				{
-					num_open_bins--;
-					num_full_bins++;
-					bins[j] = bins[num_open_bins];
-					bins[num_open_bins] = 0;
-				}
-				*/
-				
 				break;
 			}
 		}
