@@ -1,6 +1,6 @@
 /*!
 	@file	best-fit.h
-	@brief	Prototypes for "Best-Fit" heuristic
+	@brief	Prototypes for implementations of the "Best-Fit" heuristic
 
 	@author Bastian Rieck
 */
@@ -10,5 +10,7 @@
 
 unsigned int best_fit(const unsigned int*, unsigned int*, double&);
 unsigned int best_fit_depq(const unsigned* objects, double& time);
+unsigned int best_fit_heap(const unsigned* objects, double& time);
+unsigned int best_fit_lookup(const unsigned* objects, double& time);
 
 #endif

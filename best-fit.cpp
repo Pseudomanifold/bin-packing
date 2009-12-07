@@ -6,12 +6,15 @@
 */
 
 #include <iostream>
+#include <queue>
+
 #include <cstring>
 #include <ctime>
 #include <cstdlib>
-#include <queue>
+#include <cmath>
 
 #include "bin-packing.h"
+#include "simple-heap.h"
 
 /*!
 	Performs the "Best-Fit" heuristic for the current problem. Worst-case
@@ -147,4 +150,72 @@ unsigned int best_fit_depq(const unsigned* objects, double& time)
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
 
 	return(num_open_bins+num_full_bins);
+}
+
+/*!
+	An implementation of the "Best-Fit" heuristic that uses a heap in order
+	to determine the best bin more rapidly.
+*/
+
+unsigned int best_fit_heap(const unsigned* objects, double& time)
+{
+	unsigned int num_bins = 0;
+
+	simple_heap bins(n);
+	std::queue<unsigned int> heap_queue;
+	
+	clock_t start = clock();
+	for(unsigned int i = 0; i < n; i++)
+	{
+		unsigned int best_bin = n; // best bin that has been determined so far
+		unsigned int best_cap = 0; // capacity for said bin if the object has been added
+
+    		if(num_bins != 0 && (bins.data[1] + objects[i]) <= K)
+                {
+			// Perform a breadth-first-search through the bin
+                        heap_queue.push(1);
+                        while(!heap_queue.empty())
+                        {
+                                unsigned int j = heap_queue.front();
+                                unsigned int temp_cap = bins.data[j]+objects[i];
+                                if(temp_cap <= K)
+                                {
+                                        if(temp_cap > best_cap)
+                                        {
+                                                best_bin = j;
+                                                best_cap = temp_cap;
+                                        }
+
+                                        heap_queue.pop();
+
+					// Check whether the indices are still in range
+                                        if(2*j <= num_bins)
+                                                heap_queue.push(2*j);
+                                        if((2*j+1) <= num_bins)
+                                                heap_queue.push(2*j+1);
+                                }
+                                else
+                                        heap_queue.pop();
+                        }
+                }
+
+		// Best bin has been found...
+		if(best_bin < n)
+		{
+			bins.data[best_bin] += objects[i];
+			bins.reheap_down(best_bin);
+		}
+
+		// ...else create a new one
+		else
+		{
+			bins.push(objects[i]);
+			num_bins++;
+		}
+	}
+
+	clock_t end = clock();
+	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+
+	return(num_bins);
 }
