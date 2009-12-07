@@ -219,3 +219,47 @@ unsigned int best_fit_heap(const unsigned* objects, double& time)
 
 	return(num_bins);
 }
+
+/*!
+	An implementation of the "Best-Fit" heuristic that uses a lookup table
+	to determine the proper bin more rapidly. The running time thus
+	decreases to O(n*K).
+*/
+
+unsigned int best_fit_lookup(const unsigned* objects, double& time)
+{
+        unsigned int num_bins = 0;
+        unsigned int* bin_count = new unsigned int[K+1];
+        memset(bin_count, 0, (K+1)*sizeof(unsigned int));
+
+	// At the beginning of the algorithm, there are n bins with a remaining
+	// capacity of K.
+        bin_count[K] = n;
+
+        unsigned int req_size = 0; 	// Minimum required remaining capacity; finding a bin
+					// with this capacity would be optimal.
+        unsigned int cur_size = 0; 	// Stores current capacity while searching for a 
+					// suitable bin. 
+
+        clock_t start = clock();
+        for(unsigned int i = 0; i < n; i++)
+        {
+                req_size  = objects[i];
+                cur_size  = objects[i];
+
+                while(bin_count[cur_size] == 0)
+			cur_size++;
+
+                bin_count[cur_size]--;
+                bin_count[cur_size-req_size]++;
+        }
+
+        clock_t end = clock();
+        time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
+        
+	for(unsigned int i = 0; i < K; i++)
+                num_bins += bin_count[i];
+
+        delete[] bin_count;
+        return(num_bins);
+}
