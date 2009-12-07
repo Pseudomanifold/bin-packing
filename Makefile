@@ -4,7 +4,7 @@ LIBS        =
 INCLUDES    = 
 LDFLAGS     =
 
-MYOBJECTS   = bin-packing.o first-fit.o next-fit.o best-fit.o max-rest.o
+MYOBJECTS   = bin-packing.o first-fit.o next-fit.o best-fit.o max-rest.o simple-heap.o
 BIN         = bin-packing
 
 $(BIN): $(MYOBJECTS) Makefile
