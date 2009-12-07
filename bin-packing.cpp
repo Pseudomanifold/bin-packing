@@ -88,7 +88,7 @@ int csort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, cons
 /*!
 	Reads test data from STDIN. The test data is supposed to come from a
 	file that contains n in the first line, K in the second line, followed
-	all by all volumes.
+	by all volumes.
 
 	@return Pointer to an array that contains all objects. Memory is
 	allocated automatically and has to be freed by the programmer. If an
@@ -147,13 +147,19 @@ int main(int argc, char* argv[])
 	cout << "First-Fit+: " << first_fit_vec(objects, time) << " bins, ";
 	cout << time << "s\n";
 
+	cout << "First-Fit++: " << first_fit_map(objects, time) << " bins, ";
+	cout << time << "s\n";
+
 	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
 
-	cout << "First-Fit-Decreasing+: " << first_fit_decreasing_vec(objects, time, heapsort) << " bins, ";
+	cout << "First-Fit-Decreasing+ (HS): " << first_fit_decreasing_vec(objects, time, heapsort) << " bins, ";
 	cout << time << "s\n";
 	
-	cout << "First-Fit-Decreasing++: " << first_fit_decreasing_vec(objects, time, csort) << " bins, ";
+	cout << "First-Fit-Decreasing+ (CS): " << first_fit_decreasing_vec(objects, time, csort) << " bins, ";
+	cout << time << "s\n";
+
+	cout << "First-Fit-Decreasing++: " << first_fit_decreasing_map(objects, time, csort) << " bins, ";
 	cout << time << "s\n";
 
 	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
@@ -167,8 +173,11 @@ int main(int argc, char* argv[])
 
 	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
 	cout << time << "s\n";
+	
+	cout << "Best-Fit+: " << best_fit_heap(objects, time) << " bins, ";
+	cout << time << "s\n";
 
-	cout << "Best-Fit+: " << best_fit_depq(objects, time) << " bins, ";
+	cout << "Best-Fit++: " << best_fit_lookup(objects, time) << " bins, ";
 	cout << time << "s\n";
 
 	delete[] objects;
