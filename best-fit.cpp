@@ -97,14 +97,14 @@ unsigned int best_fit_heap(const unsigned* objects, double& time)
 		unsigned int best_bin = n; // best bin that has been determined so far
 		unsigned int best_cap = 0; // capacity for said bin if the object has been added
 
-    		if(num_bins != 0 && (bins.data[1] + objects[i]) <= K)
+    		if(num_bins != 0 && (bins.elements[1] + objects[i]) <= K)
                 {
 			// Perform a breadth-first-search through the bin
                         heap_queue.push(1);
                         while(!heap_queue.empty())
                         {
                                 unsigned int j = heap_queue.front();
-                                unsigned int temp_cap = bins.data[j]+objects[i];
+                                unsigned int temp_cap = bins.elements[j]+objects[i];
                                 if(temp_cap <= K)
                                 {
                                         if(temp_cap > best_cap)
@@ -129,7 +129,7 @@ unsigned int best_fit_heap(const unsigned* objects, double& time)
 		// Best bin has been found...
 		if(best_bin < n)
 		{
-			bins.data[best_bin] += objects[i];
+			bins.elements[best_bin] += objects[i];
 			bins.reheap_down(best_bin);
 		}
 
