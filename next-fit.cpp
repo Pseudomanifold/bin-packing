@@ -55,11 +55,11 @@ unsigned int next_fit(const unsigned int* objects, unsigned int* positions, doub
 */
 
 unsigned int next_fit_decreasing(	const unsigned* objects,
-					unsigned int* positions,
 					double& time,
 					int (*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
 {
 	unsigned int* sorted_objects = new unsigned int[n];
+	unsigned int* positions = new unsigned int[n];
 	memcpy(sorted_objects, objects, n*sizeof(unsigned int));
 
 	unsigned int num_bins;
@@ -74,5 +74,6 @@ unsigned int next_fit_decreasing(	const unsigned* objects,
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
 
 	delete[] sorted_objects;
+	delete[] positions;
 	return(num_bins);
 }

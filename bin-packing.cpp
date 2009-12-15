@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstring>
 #include <ctime>
@@ -22,6 +23,10 @@ unsigned int n = 0;	///< Number of objects for current problem
 unsigned int K = 0;	///< Capacity of bins for current problem
 unsigned int min_size;	///< Size of smallest object for current problem
 unsigned int max_size;	///< Size of largest object for current problem
+unsigned int sum_size;	///< Sum of object sizes for current problem
+
+unsigned int* objects;		///< Array that holds the object sizes
+unsigned int* positions;	///< Array that holds the object positions (not used for every heuristic)
 
 /*!
 	Comparison function for unsigned integers that compares values in
@@ -119,66 +124,123 @@ unsigned int* load_data()
 
 		if(objects[i-1] < min_size)
 			min_size = objects[i-1];
+
+		sum_size += objects[i-1];	
 	}
 
 	return(objects);
 }
 
+/*!
+	Writes the results of running a given heuristic to the screen. The
+	output will be formatted.
+
+	@param name	Name of the heuristic
+	@param num_bins Number of bins opened by heuristic
+	@param time	Running time of the heuristic
+*/
+
+void output_results(const char* name, unsigned int num_bins, double time)
+{
+	cout << setw(30) << left << name << "";
+	cout << setw( 8) << right << num_bins << " bins, ";
+	cout << fixed << setprecision(2) << (100.0*(num_bins/(sum_size/static_cast<double>(K)))) << "% max. deviation, ";
+	cout << fixed << setprecision(4) << time << "s\n";
+}
+
+/*!
+	Runs a certain heuristic on the current test data and formats the
+	output.
+
+	Overloadeded versions of this function exist.
+
+	@param name 	Name of the heuristic
+	@param f	Function pointer to heuristic
+*/
+
+void run(const char* name, unsigned int (*f)(const unsigned int*, unsigned int*, double&))
+{
+	double time;
+	unsigned int num_bins = f(objects, positions, time);
+
+	output_results(name, num_bins, time);
+}
+
+void run(const char* name, unsigned int (*f)(const unsigned int*, double&))
+{
+	double time;
+	unsigned int num_bins = f(objects, time);
+	
+	output_results(name, num_bins, time);
+}
+
+void run(const char* name, unsigned int (*f)(	const unsigned int*,
+						double&,
+						int(*)(void*, size_t, size_t, int (*)(const void*, const void*))),
+						int(*compare)(void*, size_t, size_t, int (*)(const void*, const void*)))
+{
+	double time;
+	unsigned int num_bins = f(objects, time, compare);
+	
+	output_results(name, num_bins, time);
+}
+
+/*!
+	Runs all heuristics for the current problem, including any SLOW
+	implementations.
+*/
+
+void run_all()
+{
+	run("Max-Rest:", 			max_rest);
+	run("Max-Rest+:", 			max_rest_pq);
+	run("First-Fit:", 			first_fit);
+	run("First-Fit+:", 			first_fit_vec);
+	run("First-Fit++:",			first_fit_map);
+	run("First-Fit-Decreasing:", 		first_fit_decreasing);
+	run("First-Fit-Decreasing+ (HS):", 	first_fit_decreasing_vec, heapsort);
+	run("First-Fit-Decreasing+ (CS):", 	first_fit_decreasing_vec, csort);
+	run("First-Fit-Decreasing++:", 		first_fit_decreasing_map, csort);
+	run("Next-Fit:", 			next_fit);
+	run("Next-Fit-Decreasing:", 		next_fit_decreasing, heapsort);
+	run("Next-Fit-Decreasing+:", 		next_fit_decreasing, csort);
+	run("Best-Fit:", 			best_fit);
+	run("Best-Fit+:", 			best_fit_heap);
+	run("Best-Fit++:", 			best_fit_lookup);
+}
+
+/*!
+	Runs only the fastest heuristics for the current problem (default setting).
+*/
+
+void run_fastest()
+{
+	run("Max-Rest+:", 			max_rest_pq);
+	run("First-Fit++:",			first_fit_map);
+	run("First-Fit-Decreasing++:", 		first_fit_decreasing_map, csort);
+	run("Next-Fit:", 			next_fit);
+	run("Next-Fit-Decreasing+:", 		next_fit_decreasing, csort);
+	run("Best-Fit++:", 			best_fit_lookup);
+}
+
 int main(int argc, char* argv[])
 {
-	unsigned int* objects	= load_data();
-	unsigned int* positions = new unsigned int[n];
+	objects = load_data();
+	positions = new unsigned int[n];
 
-	cout	<< "#objects:\t"	<< n		<< "\n"
-		<< "min:\t"		<< min_size	<< "\n"
-		<< "max:\t"		<< max_size	<< "\n\n";
+	cout 	<< "****************************************\n"
+		<< "* COMPARISON OF BIN-PACKING HEURISTICS *\n"
+		<< "****************************************\n\n"
+		<< "Objects:      " << n << "\n"
+		<< "Minimum size: " << min_size << "\n"
+		<< "Maximum size: " << max_size << "\n"
+		<< "Sum of sizes: " << sum_size << "\n"
+		<< "Bin capacity: " << K << "\n\n";
 
-	double time;
-
-	cout << "Max-Rest: " << max_rest(objects, positions, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Max-Rest+: " << max_rest_pq(objects, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit: " << first_fit(objects, positions, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit+: " << first_fit_vec(objects, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit++: " << first_fit_map(objects, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit-Decreasing: " << first_fit_decreasing(objects, positions, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit-Decreasing+ (HS): " << first_fit_decreasing_vec(objects, time, heapsort) << " bins, ";
-	cout << time << "s\n";
-	
-	cout << "First-Fit-Decreasing+ (CS): " << first_fit_decreasing_vec(objects, time, csort) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "First-Fit-Decreasing++: " << first_fit_decreasing_map(objects, time, csort) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Next-Fit: " << next_fit(objects, positions, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Next-Fit-Decreasing: " << next_fit_decreasing(objects, positions, time, heapsort) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Next-Fit-Decreasing+: " << next_fit_decreasing(objects, positions, time, csort) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Best-Fit: " << best_fit(objects, positions, time) << " bins, ";
-	cout << time << "s\n";
-	
-	cout << "Best-Fit+: " << best_fit_heap(objects, time) << " bins, ";
-	cout << time << "s\n";
-
-	cout << "Best-Fit++: " << best_fit_lookup(objects, time) << " bins, ";
-	cout << time << "s\n";
+	if(getopt(argc, argv, "a") == 'a')
+		run_all();
+	else
+		run_fastest();
 
 	delete[] objects;
 	delete[] positions;
