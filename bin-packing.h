@@ -14,6 +14,6 @@ extern unsigned int min_size;
 extern unsigned int max_size;
 
 int compare_uints(const void*, const void*);
-int csort(void*, size_t, size_t, int (*)(const void*, const void*));
+void csort(void*, size_t, size_t, int (*)(const void*, const void*));
 
 #endif

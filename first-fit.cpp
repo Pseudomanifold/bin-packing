@@ -86,10 +86,8 @@ unsigned int first_fit_decreasing(const unsigned int* objects, unsigned int* pos
 	unsigned int num_bins;
 
 	clock_t start = clock();
-	if(heapsort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = first_fit(sorted_objects, positions, time);
-	else
-		return(0);
+	qsort(sorted_objects, n, sizeof(unsigned int), compare_uints); 
+	num_bins = first_fit(sorted_objects, positions, time);
 	clock_t end = clock();
 
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
@@ -183,7 +181,7 @@ unsigned int first_fit_vec(const unsigned int* objects, double& time)
 
 unsigned int first_fit_decreasing_vec(	const unsigned int* objects,
 					double& time,
-					int(*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
+					void(*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
 {
 	unsigned int* sorted_objects = new unsigned int[n];
 	memcpy(sorted_objects, objects, n*sizeof(unsigned int));
@@ -191,10 +189,8 @@ unsigned int first_fit_decreasing_vec(	const unsigned int* objects,
 	unsigned int num_bins;
 
 	clock_t start = clock();
-	if(sort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = first_fit_vec(sorted_objects, time);
-	else
-		return(0);
+	sort(sorted_objects, n, sizeof(unsigned int), compare_uints); 
+	num_bins = first_fit_vec(sorted_objects, time);
 	clock_t end = clock();
 
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
@@ -272,7 +268,7 @@ unsigned int first_fit_map(const unsigned int* objects, double& time)
 
 unsigned int first_fit_decreasing_map(	const unsigned int* objects,
 					double& time,
-					int(*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
+					void(*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
 {
 	unsigned int* sorted_objects = new unsigned int[n];
 	memcpy(sorted_objects, objects, n*sizeof(unsigned int));
@@ -280,10 +276,8 @@ unsigned int first_fit_decreasing_map(	const unsigned int* objects,
 	unsigned int num_bins;
 
 	clock_t start = clock();
-	if(sort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = first_fit_map(sorted_objects, time);
-	else
-		return(0);
+	sort(sorted_objects, n, sizeof(unsigned int), compare_uints); 
+	num_bins = first_fit_map(sorted_objects, time);
 	clock_t end = clock();
 
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);

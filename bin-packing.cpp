@@ -1,8 +1,42 @@
 /*!
-	@file	bin.cpp
-	@brief	Bin-packing demo program
-
-	@author Bastian Rieck
+*	@file	bin.cpp
+*	@brief	Bin-packing demo program
+*
+*	@mainpage Bin-packing demo
+*
+*	An implementation of some of the most common heuristics for the Bin-packing
+*	problem. The algorithms can be compared using demo data.
+*
+*	<HR>
+*
+* 	Copyright 2010, Bastian Rieck. All rights reserved.
+*
+* 	Redistribution and use in source and binary forms, with or without
+* 	modification, are permitted provided that the following conditions are
+* 	met:
+*
+* 	-# Redistributions of source code must retain the above copyright
+* 	notice, this list of conditions and the following disclaimer.
+*	-# Redistributions in binary form must reproduce the above copyright
+*	notice, this list of conditions and the following disclaimer in the
+*	documentation and/or other materials provided with the distribution.
+*
+*	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+*	IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+*	TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*	PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+*	OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+*	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+*	LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+*	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+*	THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+*	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*	<HR>
+*
+*	@author Bastian Rieck
+*	@date 	January 2010
 */
 
 #include <iostream>
@@ -30,7 +64,7 @@ unsigned int* positions;	///< Array that holds the object positions (not used fo
 
 /*!
 	Comparison function for unsigned integers that compares values in
-	decreasing order. This function is used as an argument to heapsort.
+	decreasing order. This function is used as an argument to qsort.
 
 	@param a First unsigned int
 	@param b Second unsigned int
@@ -62,12 +96,9 @@ int compare_uints(const void* a, const void* b)
 	@param nmemb	Unused
 	@param size	Unused; size is known by global variable n
 	@param compar	Unused
-
-	@return	Always 0 in order to signify that the sorting process was
-		finished succesfully.
 */
 
-int csort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, const void*))
+void csort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, const void*))
 {
 	unsigned int range = max_size - min_size + 1;
 	unsigned int* count = new unsigned int[range];
@@ -87,7 +118,6 @@ int csort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, cons
 	}
 
 	delete []count;
-	return(0);
 }
 
 /*!
@@ -176,11 +206,11 @@ void run(const char* name, unsigned int (*f)(const unsigned int*, double&))
 
 void run(const char* name, unsigned int (*f)(	const unsigned int*,
 						double&,
-						int(*)(void*, size_t, size_t, int (*)(const void*, const void*))),
-						int(*compare)(void*, size_t, size_t, int (*)(const void*, const void*)))
+						void(*)(void*, size_t, size_t, int (*)(const void*, const void*))),
+						void(*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
 {
 	double time;
-	unsigned int num_bins = f(objects, time, compare);
+	unsigned int num_bins = f(objects, time, sort);
 	
 	output_results(name, num_bins, time);
 }
@@ -198,11 +228,11 @@ void run_all()
 	run("First-Fit+:", 			first_fit_vec);
 	run("First-Fit++:",			first_fit_map);
 	run("First-Fit-Decreasing:", 		first_fit_decreasing);
-	run("First-Fit-Decreasing+ (HS):", 	first_fit_decreasing_vec, heapsort);
+	run("First-Fit-Decreasing+ (HS):", 	first_fit_decreasing_vec, qsort);
 	run("First-Fit-Decreasing+ (CS):", 	first_fit_decreasing_vec, csort);
 	run("First-Fit-Decreasing++:", 		first_fit_decreasing_map, csort);
 	run("Next-Fit:", 			next_fit);
-	run("Next-Fit-Decreasing:", 		next_fit_decreasing, heapsort);
+	run("Next-Fit-Decreasing:", 		next_fit_decreasing, qsort);
 	run("Next-Fit-Decreasing+:", 		next_fit_decreasing, csort);
 	run("Best-Fit:", 			best_fit);
 	run("Best-Fit+:", 			best_fit_heap);

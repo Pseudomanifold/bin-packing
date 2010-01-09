@@ -50,13 +50,13 @@ unsigned int next_fit(const unsigned int* objects, unsigned int* positions, doub
 	Applies the "Next-Fit-Decreasing" heuristic to the current problem.
 	Since the worst-case running time of "Next-Fit" is O(n), the running
 	time of "Next-Fit-Decreasing" is dominated by the sorting procedure.
-	Hence, the worst-case running time is O(n log n) when using heapsort or
+	Hence, the worst-case running time is O(n log n) when using quicksort or
 	O(n) when using csort.
 */
 
 unsigned int next_fit_decreasing(	const unsigned* objects,
 					double& time,
-					int (*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
+					void (*sort)(void*, size_t, size_t, int (*)(const void*, const void*)))
 {
 	unsigned int* sorted_objects = new unsigned int[n];
 	unsigned int* positions = new unsigned int[n];
@@ -65,12 +65,10 @@ unsigned int next_fit_decreasing(	const unsigned* objects,
 	unsigned int num_bins;
 
 	clock_t start = clock();
-	if(sort(sorted_objects, n, sizeof(unsigned int), compare_uints) == 0)
-		num_bins = next_fit(sorted_objects, positions, time);
-	else
-		return(0);
-
+	sort(sorted_objects, n, sizeof(unsigned int), compare_uints); 
+	num_bins = next_fit(sorted_objects, positions, time);
 	clock_t end = clock();
+	
 	time = (end-start)/static_cast<double>(CLOCKS_PER_SEC);
 
 	delete[] sorted_objects;

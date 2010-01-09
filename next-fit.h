@@ -11,6 +11,6 @@
 unsigned int next_fit(const unsigned int*, unsigned int*, double&);
 unsigned int next_fit_decreasing(	const unsigned*,
 					double&,
-					int (*)(void*, size_t, size_t, int (*)(const void*, const void*)));
+					void (*)(void*, size_t, size_t, int (*)(const void*, const void*)));
 
 #endif

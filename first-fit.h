@@ -17,9 +17,9 @@ unsigned int first_fit_map(const unsigned int*, double&);
 
 unsigned int first_fit_decreasing_vec(	const unsigned int*, 
 					double&, 
-					int(*)(void*, size_t, size_t, int (*)(const void*, const void*)));
+					void(*)(void*, size_t, size_t, int (*)(const void*, const void*)));
 unsigned int first_fit_decreasing_map(	const unsigned int*,
 					double&,
-					int(*)(void*, size_t, size_t, int (*)(const void*, const void*)));
+					void(*)(void*, size_t, size_t, int (*)(const void*, const void*)));
 
 #endif
