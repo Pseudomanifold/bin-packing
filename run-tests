@@ -1,0 +1,13 @@
+#!/bin/sh
+
+make clean
+make
+./bin-packing < data/bp1 > results.log
+./bin-packing < data/bp2 >> results.log
+./bin-packing < data/bp3 >> results.log
+./bin-packing < data/bp4 >> results.log
+./bin-packing < data/bp5 >> results.log
+./bin-packing < data/bp6 >> results.log
+./bin-packing < data/bp7 >> results.log
+./bin-packing < data/bp8 >> results.log
+./bin-packing < data/bp9 >> results.log
