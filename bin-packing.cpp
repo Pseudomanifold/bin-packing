@@ -46,6 +46,8 @@
 #include <ctime>
 #include <cstdlib>
 
+#include <getopt.h>
+
 #include "bin-packing.h"
 #include "first-fit.h"
 #include "next-fit.h"
